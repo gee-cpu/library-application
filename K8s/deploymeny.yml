@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libraryservice
+  namespace: default
+  labels:
+    app: libraryservice
+spec:
+  selector:
+    matchLabels:
+      app: libraryservice
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: libraryserviceel
+    spec:
+      containers:
+        - name: libraryservice
+          image: geecpu/libraryservice:latest
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 100Mi
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: libraryservice-svc
+  namespace: default
+spec:
+  selector:
+    app: libraryservice
+  type: ClusterIP
+  sessionAffinity: None
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+    - name: libraryservice
+      protocol: TCP
+      port: 80
+      targetPort: 8082
